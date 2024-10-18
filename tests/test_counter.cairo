@@ -1,8 +1,15 @@
 use starknet::{ContractAddress};
-use snforge_std::{declare, ContractClassTrait, DeclareResultTrait, start_cheat_caller_address};
-use hello_starknet::counter::{
-    ICounterDispatcher, ICounterDispatcherTrait, ICounterSafeDispatcher, ICounterSafeDispatcherTrait
+use snforge_std::{
+    declare, ContractClassTrait, DeclareResultTrait, start_cheat_caller_address, spy_events,
+    EventSpyAssertionsTrait,
 };
+use hello_starknet::counter::{
+    Counter, ICounterDispatcher, ICounterDispatcherTrait, ICounterSafeDispatcher,
+    ICounterSafeDispatcherTrait
+};
+// use testing_events::contract::{
+//     SpyEventsChecker, ISpyEventsCheckerDispatcher, ISpyEventsCheckerDispatcherTrait
+// };
 
 pub mod Accounts {
     use starknet::ContractAddress;
@@ -60,4 +67,24 @@ fn test_set_owner_should_panic_when_called_with_zero_value() {
         Result::Ok(_) => core::panic_with_felt252('Should have panicked'),
         Result::Err(panic_data) => { assert(*panic_data.at(0) == 'zero value', *panic_data.at(0)); }
     }
+}
+
+#[test]
+fn test_event_was_emitted_on_set_count() {
+    let contract_address = deploy("Counter");
+    let counter_dispatcher = ICounterDispatcher { contract_address };
+
+    let mut spy = spy_events();
+    counter_dispatcher.set_count(99);
+
+    spy
+        .assert_emitted(
+            @array![
+                (contract_address,
+                Counter::Event::SetCountCalled(
+                    Counter::SetCountCalled { owner: contract_address, value: 99 }
+                ))
+            ]
+        );
+    // assert(, '');
 }
