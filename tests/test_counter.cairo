@@ -7,9 +7,6 @@ use hello_starknet::counter::{
     Counter, ICounterDispatcher, ICounterDispatcherTrait, ICounterSafeDispatcher,
     ICounterSafeDispatcherTrait
 };
-// use testing_events::contract::{
-//     SpyEventsChecker, ISpyEventsCheckerDispatcher, ISpyEventsCheckerDispatcherTrait
-// };
 
 pub mod Accounts {
     use starknet::ContractAddress;
@@ -86,5 +83,4 @@ fn test_event_was_emitted_on_set_count() {
                 ))
             ]
         );
-    // assert(, '');
 }
